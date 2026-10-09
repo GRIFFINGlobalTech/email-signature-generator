@@ -1,7 +1,8 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormField } from './FormField'
+import { SignatureStudio } from './SignatureStudio'
 import {
   REQUIRED_FIELDS,
   signatureFormDefaults,
@@ -23,6 +24,8 @@ function CheckIcon() {
 }
 
 export function SignatureForm() {
+  const [signatureDetails, setSignatureDetails] = useState(null)
+
   const {
     register,
     handleSubmit,
@@ -52,6 +55,10 @@ export function SignatureForm() {
   const onSubmit = async (data) => {
     await new Promise((resolve) => setTimeout(resolve, 450))
     console.info('Signature form submitted', data)
+  }
+
+  if (isSubmitSuccessful && signatureDetails) {
+    return <SignatureStudio details={signatureDetails} onBack={() => setSignatureDetails(null)} />
   }
 
   if (isSubmitSuccessful) {
@@ -96,6 +103,13 @@ export function SignatureForm() {
           </button>
           <button type="button" className="btn btn--primary" onClick={() => reset(values)}>
             Edit these details
+          </button>
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={() => setSignatureDetails(signatureFormSchema.parse(values))}
+          >
+            Generate signature
           </button>
         </div>
       </section>
