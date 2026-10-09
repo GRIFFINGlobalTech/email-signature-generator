@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap');
+
+.studio .form-card__header h2 {
+  margin: 8px 0 10px;
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.studio__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 55%, transparent);
+}
+
+.segmented__option {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.segmented__option.is-active {
+  background: var(--lime);
+  color: #101208;
+}
+
+.segmented__option:focus-visible,
+.switch input:focus-visible + .switch__track,
+.size-option:has(input:focus-visible) {
+  outline: 3px solid var(--lime-dim);
+  outline-offset: 2px;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switch__track {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--ink) 55%, transparent);
+  transition: background 160ms ease;
+}
+
+.switch__track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.switch input:checked + .switch__track {
+  background: var(--lime-dim);
+  border-color: var(--lime);
+}
+
+.switch input:checked + .switch__track::after {
+  transform: translateX(18px);
+  background: var(--lime);
+}
+
+.studio__preview {
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.studio__preview figcaption {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.signature-stage {
+  position: relative;
+  min-height: 180px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  place-items: center;
+  padding: clamp(16px, 4vw, 40px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow-x: auto;
+  transition: background 160ms ease;
+}
+
+.signature-stage.is-checker {
+  background-color: #ffffff;
+  background-image: conic-gradient(#d9ddd2 25%, transparent 0 50%, #d9ddd2 0 75%, transparent 0);
+  background-size: 20px 20px;
+}
+
+.signature-canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.signature-stage__loading {
+  position: absolute;
+  margin: 0;
+  color: #7a8470;
+  font-weight: 700;
+}
+
+.size-options {
+  display: grid;
+  gap: 12px;
+}
+
+.size-option {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.size-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.size-option:hover {
+  border-color: var(--lime);
+}
+
+.size-option.is-active {
+  border-color: var(--lime);
+  background: var(--lime-dim);
+}
+
+.size-option__title {
+  font-weight: 800;
+}
+
+.size-option__title span {
+  color: var(--lime);
+  margin-left: 4px;
+}
+
+.size-option__dims {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.size-option__hint {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.studio__status {
+  margin: 0;
+  min-height: 1.4em;
+  color: var(--muted);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.studio__status.is-error {
+  color: var(--danger);
+}
+
+@media (min-width: 760px) {
+  .size-options {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch__track,
+  .switch__track::after,
+  .signature-stage,
+  .size-option {
+    transition: none;
+  }
+}
