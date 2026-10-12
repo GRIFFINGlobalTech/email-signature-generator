@@ -4,7 +4,10 @@ import {
   SIGNATURE_COMPANY,
   SIGNATURE_MODES,
   SIGNATURE_SCALES,
+  type SignatureMode,
+  type SignatureScaleId,
 } from '../config/signature'
+import type { SignatureFormData } from '../schemas/signatureForm'
 import {
   createSignaturePng,
   downloadBlob,
@@ -15,25 +18,40 @@ import {
 import {
   canCopyImage,
   copySignature,
-  downloadSignatures,
 } from '../services/signatureActions'
 import './SignatureStudio.css'
 
 
-const MODE_IDS = Object.keys(SIGNATURE_MODES)
+const MODE_IDS = Object.values(SIGNATURE_MODES).map(({ id }) => id)
 
-function initialMode() {
+type SignatureStudioProps = {
+  details: SignatureFormData
+  onBack: () => void
+}
+
+type SignatureSize = {
+  width: number
+  height: number
+}
+
+type StudioStatus = {
+  busy: boolean
+  message: string
+  error: boolean
+}
+
+function initialMode(): SignatureMode {
   return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
 }
 
-export function SignatureStudio({ details, onBack }) {
-  const canvasRef = useRef(null)
-  const [mode, setMode] = useState(initialMode)
-  const [scaleId, setScaleId] = useState(DEFAULT_SCALE_ID)
+export function SignatureStudio({ details, onBack }: SignatureStudioProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [mode, setMode] = useState<SignatureMode>(initialMode)
+  const [scaleId, setScaleId] = useState<SignatureScaleId>(DEFAULT_SCALE_ID)
   const [showTransparency, setShowTransparency] = useState(false)
   const [fontsReady, setFontsReady] = useState(false)
-  const [size, setSize] = useState(null)
-  const [status, setStatus] = useState({ busy: false, message: '', error: false })
+  const [size, setSize] = useState<SignatureSize | null>(null)
+  const [status, setStatus] = useState<StudioStatus>({ busy: false, message: '', error: false })
 
   const scale = SIGNATURE_SCALES.find((option) => option.id === scaleId) ?? SIGNATURE_SCALES[1]
   const activeMode = SIGNATURE_MODES[mode]
@@ -55,7 +73,7 @@ export function SignatureStudio({ details, onBack }) {
     setSize(renderSignature(canvasRef.current, details, { mode, scale: previewScale }))
   }, [details, mode, fontsReady])
 
-  const download = async (modes) => {
+  const download = async (modes: readonly SignatureMode[]) => {
     setStatus({ busy: true, message: 'Generating PNG…', error: false })
     try {
       const files = []
@@ -213,8 +231,13 @@ const copy = async () => {
       </p>
 
       <div className="form-actions studio__actions">
-        <button type="button" className="btn btn--ghost" onClick={onBack}>
-          Back to details
+        <button
+          type="button"
+          className="btn btn--primary"
+          onClick={() => download([mode])}
+          disabled={status.busy || !fontsReady}
+        >
+          Download {activeMode.label.toLowerCase()} PNG
         </button>
         <button
           type="button"
@@ -233,13 +256,8 @@ const copy = async () => {
         >
           Download both
         </button>
-        <button
-          type="button"
-          className="btn btn--primary"
-          onClick={() => download([mode])}
-          disabled={status.busy || !fontsReady}
-        >
-          Download {activeMode.label.toLowerCase()} PNG
+        <button type="button" className="btn btn--ghost btn--back" onClick={onBack}>
+          Back to details
         </button>
       </div>
     </section>

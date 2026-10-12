@@ -1,4 +1,5 @@
-import { SIGNATURE_MODES } from '../config/signature'
+import { SIGNATURE_MODES, type SignatureMode } from '../config/signature'
+import type { SignatureFormData } from '../schemas/signatureForm'
 import { createSignaturePng, downloadBlob, signatureFileName } from './signatureRenderer'
 
 export const canCopyImage = () =>
@@ -6,7 +7,11 @@ export const canCopyImage = () =>
 
 // Downloads one PNG per mode. Always fully transparent.
 // Returns the file names so the UI can report them.
-export async function downloadSignatures(details, modes, scale) {
+export async function downloadSignatures(
+  details: SignatureFormData,
+  modes: readonly SignatureMode[],
+  scale: number,
+) {
   const files = []
   for (const mode of modes) {
     const { blob } = await createSignaturePng(details, { mode, scale })
@@ -19,7 +24,7 @@ export async function downloadSignatures(details, modes, scale) {
 
 // Copies one PNG to the clipboard.
 // Dark mode gets a baked-in dark backing so the light text stays visible when pasted.
-export async function copySignature(details, mode, scale) {
+export async function copySignature(details: SignatureFormData, mode: SignatureMode, scale: number) {
   if (!canCopyImage()) {
     throw new Error('Copy is not supported in this browser. Use Download instead.')
   }

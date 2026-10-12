@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
+    "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "test": "playwright test",
     "test:show-report": "playwright show-report"
@@ -16,6 +17,8 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
+    "flag-icons": "^7.5.0",
+    "libphonenumber-js": "^1.13.15",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-hook-form": "^7.89.0",
@@ -28,6 +31,7 @@
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
     "oxlint": "^1.81.0",
+    "typescript": "^7.0.2",
     "vite": "^8.3.0"
   }
 }

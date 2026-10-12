@@ -2,21 +2,24 @@ import { useEffect, useState } from 'react'
 import { GriffinLogo } from './components/GriffinLogo'
 import { SignatureForm } from './components/SignatureForm'
 
-function getSystemTheme() {
+type Theme = 'dark' | 'light'
+type ThemeMode = 'manual' | 'system'
+
+function getSystemTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-function getStoredTheme() {
+function getStoredTheme(): Theme | null {
   const stored = localStorage.getItem('ggt-theme')
   return stored === 'light' || stored === 'dark' ? stored : null
 }
 
 export default function App() {
-  const [theme, setTheme] = useState(() => {
+  const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === 'undefined') return 'dark'
     return getStoredTheme() ?? getSystemTheme()
   })
-  const [themeMode, setThemeMode] = useState(() => {
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     if (typeof window === 'undefined') return 'system'
     return getStoredTheme() ? 'manual' : 'system'
   })

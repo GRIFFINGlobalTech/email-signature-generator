@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect, useMemo, useState } from 'react'
+import { Controller, useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormField } from './FormField'
 import { SignatureStudio } from './SignatureStudio'
@@ -7,7 +7,21 @@ import {
   REQUIRED_FIELDS,
   signatureFormDefaults,
   signatureFormSchema,
+  type SignatureFormData,
+  type SignatureFormInput,
 } from '../schemas/signatureForm'
+import { formatPhoneNumber } from '../utils/phone'
+import { PhoneCountryPicker } from './PhoneCountryPicker'
+
+const COMPANY_EMAIL_DOMAIN = 'griffinglobaltech.com'
+
+function emailNamePart(name: string) {
+  return name
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+}
 
 function CheckIcon() {
   return (
@@ -24,22 +38,33 @@ function CheckIcon() {
 }
 
 export function SignatureForm() {
-  const [signatureDetails, setSignatureDetails] = useState(null)
+  const [signatureDetails, setSignatureDetails] = useState<SignatureFormData | null>(null)
 
   const {
     register,
     handleSubmit,
     reset,
-    watch,
+    setValue,
+    control,
     formState: { errors, isSubmitting, isSubmitSuccessful, dirtyFields, touchedFields },
-  } = useForm({
+  } = useForm<SignatureFormInput, unknown, SignatureFormData>({
     resolver: zodResolver(signatureFormSchema),
     defaultValues: signatureFormDefaults,
     mode: 'onTouched',
     reValidateMode: 'onChange',
   })
 
-  const values = watch()
+  const values = useWatch({ control })
+  useEffect(() => {
+    if (dirtyFields.email) return
+
+    const firstName = emailNamePart(values.firstName ?? '')
+    const surname = emailNamePart(values.surname ?? '')
+    const suggestedEmail =
+      firstName && surname ? `${firstName}.${surname}@${COMPANY_EMAIL_DOMAIN}` : ''
+
+    setValue('email', suggestedEmail)
+  }, [dirtyFields.email, setValue, values.firstName, values.surname])
 
   const completedRequired = useMemo(
     () =>
@@ -52,7 +77,7 @@ export function SignatureForm() {
 
   const progress = Math.round((completedRequired / REQUIRED_FIELDS.length) * 100)
 
-  const onSubmit = async (data) => {
+  const onSubmit: SubmitHandler<SignatureFormData> = async (data) => {
     await new Promise((resolve) => setTimeout(resolve, 450))
     console.info('Signature form submitted', data)
   }
@@ -90,10 +115,21 @@ export function SignatureForm() {
           </div>
           <div>
             <dt>Phone</dt>
-            <dd>{values.phone}</dd>
+            <dd>
+              {values.phone && values.phoneCountry
+                ? formatPhoneNumber(values.phone, values.phoneCountry)
+                : ''}
+            </dd>
           </div>
         </dl>
-        <div className="form-actions">
+        <div className="form-actions form-actions--success">
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={() => setSignatureDetails(signatureFormSchema.parse(values))}
+          >
+            Generate signature
+          </button>
           <button
             type="button"
             className="btn btn--ghost"
@@ -101,15 +137,8 @@ export function SignatureForm() {
           >
             Enter another person
           </button>
-          <button type="button" className="btn btn--primary" onClick={() => reset(values)}>
+          <button type="button" className="btn btn--ghost" onClick={() => reset(values)}>
             Edit these details
-          </button>
-          <button
-            type="button"
-            className="btn btn--primary"
-            onClick={() => setSignatureDetails(signatureFormSchema.parse(values))}
-          >
-            Generate signature
           </button>
         </div>
       </section>
@@ -195,7 +224,7 @@ export function SignatureForm() {
             label="Company email"
             required
             error={errors.email?.message}
-            hint="Must be a @griffinglobaltech.com address."
+            hint="Suggested from first and surname. Edit if your company email differs."
             className="span-2"
           >
             {(fieldProps) => (
@@ -214,17 +243,31 @@ export function SignatureForm() {
             label="Phone"
             required
             error={errors.phone?.message}
-            hint="Include country code."
+            hint="Type a country name in the dropdown; its calling code appears beside it."
           >
             {(fieldProps) => (
-              <input
-                {...fieldProps}
-                {...register('phone')}
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                placeholder="+1 (678) 261-8289"
-              />
+              <div className="phone-field">
+                <Controller
+                  name="phoneCountry"
+                  control={control}
+                  render={({ field }) => (
+                    <PhoneCountryPicker
+                      value={field.value}
+                      onChange={field.onChange}
+                      describedBy="phone-hint"
+                      error={errors.phoneCountry?.message}
+                    />
+                  )}
+                />
+                <input
+                  {...fieldProps}
+                  {...register('phone')}
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel-national"
+                  placeholder="678 261 8289"
+                />
+              </div>
             )}
           </FormField>
         </div>
@@ -248,16 +291,16 @@ export function SignatureForm() {
         </p>
       ) : null}
 
-      <div className="form-actions">
+      <div className="form-actions form-actions--form">
+        <button type="submit" className="btn btn--primary" disabled={isSubmitting}>
+          {isSubmitting ? 'Validating…' : 'Continue'}
+        </button>
         <button
           type="button"
           className="btn btn--ghost"
           onClick={() => reset(signatureFormDefaults)}
         >
           Clear form
-        </button>
-        <button type="submit" className="btn btn--primary" disabled={isSubmitting}>
-          {isSubmitting ? 'Validating…' : 'Continue'}
         </button>
       </div>
     </form>

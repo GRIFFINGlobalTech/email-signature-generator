@@ -55,6 +55,7 @@ body,
 
 html {
   background: var(--ink);
+  scroll-padding-block-end: 14rem;
 }
 
 body {
@@ -84,6 +85,7 @@ select {
   margin: 0 auto;
   padding: 24px 0 48px;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 28px;
 }
 
@@ -100,6 +102,11 @@ select {
   padding-top: 20px;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.site-main,
+.form-card {
+  min-width: 0;
 }
 
 .theme-toggle {
@@ -172,11 +179,13 @@ select {
 }
 
 .form-card {
+  --card-gutter: clamp(20px, 4vw, 40px);
+  width: 100%;
   background: linear-gradient(180deg, var(--panel), var(--panel-2));
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: clamp(20px, 4vw, 40px);
+  padding: var(--card-gutter);
   display: grid;
   gap: 28px;
 }
@@ -184,6 +193,10 @@ select {
 .form-card--success {
   text-align: center;
   justify-items: center;
+}
+
+.form-card--success .form-actions {
+  width: 100%;
 }
 
 .form-card__header h1,
@@ -299,6 +312,173 @@ select {
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
+.phone-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 8px;
+}
+
+.phone-country-picker {
+  position: relative;
+  min-width: 0;
+}
+
+.phone-country-picker.is-open {
+  z-index: 3;
+}
+
+.phone-country-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background-color: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.phone-country-trigger:hover,
+.phone-country-trigger:focus-visible,
+.phone-country-trigger[aria-expanded='true'] {
+  border-color: var(--lime);
+}
+
+.phone-country-trigger:focus-visible,
+.phone-country-search:focus-visible {
+  outline: 3px solid var(--lime-dim);
+  outline-offset: 2px;
+}
+
+.phone-country-trigger[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.phone-country-trigger .fi,
+.phone-country-option .fi {
+  flex: 0 0 auto;
+  width: 1.4em;
+  height: 1em;
+  border-radius: 2px;
+  background-size: cover;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+.phone-country-flag-fallback {
+  display: inline-grid;
+  flex: 0 0 auto;
+  width: 1.4em;
+  height: 1em;
+  place-items: center;
+  border-radius: 2px;
+  background: var(--lime-dim);
+  color: var(--lime);
+  font-size: 0.55rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.phone-country-trigger__dial-code {
+  flex: 1;
+  color: var(--lime);
+  font-weight: 800;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.phone-country-trigger__chevron {
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  transform: rotate(45deg) translateY(-2px);
+}
+
+.phone-country-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 10;
+  width: min(340px, calc(100vw - 64px));
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.phone-country-search {
+  width: 100%;
+  min-height: 44px;
+  margin-bottom: 6px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--text);
+}
+
+.phone-country-search::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.phone-country-options {
+  max-height: 240px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.phone-country-option {
+  display: grid;
+  grid-template-columns: 1.4em minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 10px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.phone-country-option.is-active,
+.phone-country-option:hover {
+  background: var(--lime-dim);
+}
+
+.phone-country-option[aria-selected='true'] {
+  color: var(--lime);
+  font-weight: 800;
+}
+
+.phone-country-option__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.phone-country-option__dial-code {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.phone-country-empty {
+  margin: 0;
+  padding: 12px 10px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.phone-field input {
+  min-width: 0;
+}
+
 .field select {
   appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, var(--lime) 50%),
@@ -325,6 +505,12 @@ select {
 
 .field.has-error input,
 .field.has-error select {
+  border-color: var(--danger);
+  background: var(--danger-dim);
+}
+
+.field.has-error .phone-field input,
+.field.has-error .phone-field select {
   border-color: var(--danger);
   background: var(--danger-dim);
 }
@@ -377,7 +563,13 @@ select {
   gap: 12px;
   justify-content: flex-end;
   position: sticky;
-  bottom: 12px;
+  bottom: 0;
+  z-index: 2;
+  margin: 0 calc(-1 * var(--card-gutter)) calc(-1 * var(--card-gutter));
+  padding: 16px var(--card-gutter) max(8px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 calc(var(--radius) - 1px) calc(var(--radius) - 1px);
+  background: var(--panel-2);
 }
 
 .btn {
@@ -484,10 +676,44 @@ select {
 
   .form-actions {
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
 
-  .btn {
+  .form-actions .btn {
     width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    padding-inline: 8px;
+    font-size: clamp(0.76rem, 3.4vw, 0.88rem);
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .form-actions .btn--primary,
+  .form-actions .btn--back,
+  .form-actions--form .btn--ghost {
+    grid-column: 1 / -1;
+  }
+
+  .form-actions--form .btn--ghost,
+  .studio__actions .btn--back {
+    justify-self: center;
+    width: auto;
+    min-width: 50%;
+  }
+}
+
+@media (max-width: 379px) {
+  .form-actions--success {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 359px) {
+  .studio__actions {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
