@@ -11,7 +11,7 @@ This repository is an initialized Vite + React project only. Feature work is not
 - CSS
 - Vite
 - GitHub (version control)
-- Vercel (planned deployment)
+- GitHub Pages (deployment)
 
 ## Getting started
 
@@ -57,4 +57,11 @@ npm run lint
 
 ## Deployment
 
-Target host is Vercel. After the first GitHub push, connect this repository in the Vercel dashboard. Vite is detected automatically (`npm run build`, output `dist`).
+The site is deployed to GitHub Pages by the workflow in `.github/workflows/deploy-pages.yml`.
+
+1. Push or merge your changes to `main`.
+2. In the repository on GitHub, open **Settings > Pages** and select **GitHub Actions** under **Build and deployment > Source**.
+3. Open the **Actions** tab and wait for the **Deploy to GitHub Pages** workflow to finish.
+4. Visit <https://griffinglobaltech.github.io/email-signature-generator/>.
+
+The workflow builds the Vite app and publishes the `dist` directory. Local development continues to use the root path; the repository subpath is applied only in GitHub Actions builds.
