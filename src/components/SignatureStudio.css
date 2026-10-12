@@ -124,6 +124,11 @@
   background-size: 20px 20px;
 }
 
+.signature-stage.is-checker--dark {
+  background-color: #1f1f1f;
+  background-image: conic-gradient(#2e2e2e 25%, transparent 0 50%, #2e2e2e 0 75%, transparent 0);
+}
+
 .signature-canvas {
   display: block;
   max-width: 100%;
