@@ -6,8 +6,10 @@ test.describe('2.0.1-2.0.1: Check that required fields, labels, placeholders, an
   test('displays the signature form and accepts user input', async ({ page }) => {
     await page.goto('/')
 
-    await page.locator('#firstName').fill('Ada')
-    await page.locator('#surname').fill('Lovelace')
+    await page.locator('#firstName').fill('ada')
+    await expect(page.locator('#firstName')).toHaveValue('Ada')
+    await page.locator('#surname').fill('lovelace')
+    await expect(page.locator('#surname')).toHaveValue('Lovelace')
     await expect(page.locator('#email')).toHaveValue('')
     await page.locator('#jobTitle').fill('chief executive officer')
     await expect(page.locator('#jobTitle')).toHaveValue('Chief Executive Officer')

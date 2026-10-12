@@ -114,7 +114,7 @@
   padding: clamp(16px, 4vw, 40px);
   border: 1px solid var(--line);
   border-radius: 16px;
-  overflow-x: auto;
+  overflow: hidden;
   transition: background 160ms ease;
 }
 

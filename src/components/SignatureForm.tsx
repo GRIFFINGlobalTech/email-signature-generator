@@ -13,10 +13,14 @@ import {
 import { formatPhoneNumber } from '../utils/phone'
 import { PhoneCountryPicker } from './PhoneCountryPicker'
 
-function capitalizeTitle(value: string) {
+function capitalizeWords(value: string) {
   return value.replace(/(^|[\s-])(\p{L})/gu, (_, separator: string, letter: string) =>
     `${separator}${letter.toUpperCase()}`,
   )
+}
+
+function capitalizeInput(event: { currentTarget: HTMLInputElement }) {
+  event.currentTarget.value = capitalizeWords(event.currentTarget.value)
 }
 
 function CheckIcon() {
@@ -160,7 +164,7 @@ export function SignatureForm() {
             {(fieldProps) => (
               <input
                 {...fieldProps}
-                {...register('firstName')}
+                {...register('firstName', { onChange: capitalizeInput })}
                 autoComplete="given-name"
                 placeholder="Dan"
               />
@@ -170,7 +174,7 @@ export function SignatureForm() {
             {(fieldProps) => (
               <input
                 {...fieldProps}
-                {...register('surname')}
+                {...register('surname', { onChange: capitalizeInput })}
                 autoComplete="family-name"
                 placeholder="Hoover"
               />
@@ -192,11 +196,7 @@ export function SignatureForm() {
             {(fieldProps) => (
               <input
                 {...fieldProps}
-                {...register('jobTitle', {
-                  onChange: (event) => {
-                    event.currentTarget.value = capitalizeTitle(event.currentTarget.value)
-                  },
-                })}
+                {...register('jobTitle', { onChange: capitalizeInput })}
                 autoComplete="organization-title"
                 placeholder="Chief Executive Officer"
               />
