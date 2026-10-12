@@ -1,8 +1,9 @@
-import { SIGNATURE_MODES, type SignatureMode } from '../config/signature'
+import type { SignatureMode } from '../config/signature'
 import type { SignatureFormData } from '../schemas/signatureForm'
-import { createSignaturePng, downloadBlob, signatureFileName } from './signatureRenderer'
+import { buildSignatureHtml, buildSignatureText } from './signatureHtml'
+import { createLogoDataUrl, createSignaturePng, downloadBlob, signatureFileName } from './signatureRenderer'
 
-export const canCopyImage = () =>
+export const canCopySignature = () =>
   typeof ClipboardItem !== 'undefined' && Boolean(navigator.clipboard?.write)
 
 // Downloads one PNG per mode. Always fully transparent.
@@ -22,17 +23,21 @@ export async function downloadSignatures(
   return files
 }
 
-// Copies one PNG to the clipboard.
-// Dark mode gets a baked-in dark backing so the light text stays visible when pasted.
-export async function copySignature(details: SignatureFormData, mode: SignatureMode, scale: number) {
-  if (!canCopyImage()) {
+// Copies the whole signature as rich text: the logo as an embedded image, every detail as
+// real, linked text, plus a plain-text fallback. Pasting into Outlook or Gmail keeps all of it,
+// at the right size, and the client handles dark mode for the text.
+export async function copySignature(details: SignatureFormData) {
+  if (!canCopySignature()) {
     throw new Error('Copy is not supported in this browser. Use Download instead.')
   }
 
-  const background = mode === 'dark' ? SIGNATURE_MODES.dark.previewBackground : undefined
-
-  // Pass a promise, not an awaited blob. Safari drops the click's permission
+  // Pass promises, not awaited blobs. Safari drops the click's permission
   // if anything is awaited before the clipboard write.
-  const png = createSignaturePng(details, { mode, scale, background }).then((r) => r.blob)
-  await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })])
+  const html = createLogoDataUrl({ mode: 'light', scale: 2 }).then(
+    ({ dataUrl, size }) =>
+      new Blob([buildSignatureHtml(details, { src: dataUrl, ...size })], { type: 'text/html' }),
+  )
+  const text = new Blob([buildSignatureText(details)], { type: 'text/plain' })
+
+  await navigator.clipboard.write([new ClipboardItem({ 'text/html': html, 'text/plain': text })])
 }
