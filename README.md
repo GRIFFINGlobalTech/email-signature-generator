@@ -34,13 +34,13 @@ npm run lint
 
 | Ticket | Owners | Status |
 | --- | --- | --- |
-| FT-Setup Project | Harun / Kelvin | In progress (this repo) |
-| FT-Form | Harun / Kelvin | Not started |
-| FT-Preview | Kevin Kirui / Karen | Not started |
-| FT-Generate Signature | Kevin Kirui / Karen | Not started |
-| FT-Generated Signature Download | Evans / Nora | Not started |
-| FT-Copy Generated Signature | Evans / Nora | Not started |
-| Verification and Testing | Edwin | Not started |
+| FT-Setup Project | Harun / Kelvin | Done |
+| FT-Form | Harun / Kelvin | Done|
+| FT-Preview | Kevin Kirui / Karen | Done |
+| FT-Generate Signature | Kevin Kirui / Karen | Done |
+| FT-Generated Signature Download | Evans / Nora | Done |
+| FT-Copy Generated Signature | Evans / Nora | Done |
+| Verification and Testing | Edwin | Done |
 
 ## Product backlog (do not implement in this setup commit)
 
