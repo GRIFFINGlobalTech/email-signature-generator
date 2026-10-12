@@ -3,6 +3,25 @@ import { expect, test } from '@playwright/test'
 import { fillSignatureForm, invalidSignatureFixture, validWhitespaceSignatureFixture } from '../fixtures/signature'
 
 test.describe('2.2.1-2.2.1: Validate email format and company domain, phone format, whitespace, and accepted input.', () => {
+  test('keeps paired inputs aligned when one field displays a validation error', async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 900 })
+    await page.goto('/')
+    await fillSignatureForm(page)
+
+    const firstName = page.locator('#firstName')
+    const surname = page.locator('#surname')
+    const getTop = async (locator) => (await locator.boundingBox()).y
+    const initialTopDifference = Math.abs((await getTop(firstName)) - (await getTop(surname)))
+    expect(initialTopDifference).toBeLessThan(1)
+
+    await firstName.fill('')
+    await firstName.blur()
+    await expect(page.locator('#firstName-error')).toBeVisible()
+
+    const topDifferenceAfterError = Math.abs((await getTop(firstName)) - (await getTop(surname)))
+    expect(topDifferenceAfterError).toBeLessThan(1)
+  })
+
   test('flags invalid values and accepts valid values with extra whitespace', async ({ page }) => {
     await page.goto('/')
 
