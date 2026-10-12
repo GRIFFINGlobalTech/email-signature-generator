@@ -16,7 +16,7 @@ import {
   signatureFileName,
 } from '../services/signatureRenderer'
 import {
-  canCopyImage,
+  canCopySignature,
   copySignature,
 } from '../services/signatureActions'
 import './SignatureStudio.css'
@@ -98,13 +98,11 @@ export function SignatureStudio({ details, onBack }: SignatureStudioProps) {
 const copy = async () => {
   setStatus({ busy: true, message: 'Copying…', error: false })
   try {
-    await copySignature(details, mode, scale.value)
+    await copySignature(details)
     setStatus({
       busy: false,
       message:
-        mode === 'dark'
-          ? 'Copied with a dark background. Use Download for a transparent version.'
-          : 'Copied light signature. Paste it into your email client.',
+        'Copied. Paste it into the signature box in Outlook or Gmail: logo, details and links are all included.',
       error: false,
     })
   } catch {
@@ -206,20 +204,21 @@ const copy = async () => {
 
       <div className="company-note" role="note">
         <p>
-          <strong>Before you paste it into Outlook or Gmail:</strong>
+          <strong>Adding it to Outlook or Gmail:</strong>
         </p>
         <ul>
+          <li>
+            Use <strong>Copy signature</strong> and paste into the signature editor. Your email,
+            phone and {SIGNATURE_COMPANY.websiteLabel} stay as clickable text, and your inbox
+            adjusts the colours in dark mode automatically.
+          </li>
           {size ? (
             <li>
-              Set the image width to {size.width} px ({size.width} × {size.height}) so it shows
-              at the right size. Larger exports only make it sharper.
+              Inserting a downloaded PNG instead? Set its width to {size.width} px so it shows
+              at the right size, and pick the mode that matches your inbox. Dark mode text is
+              white, so it looks blank on a white background.
             </li>
           ) : null}
-          <li>
-            Images can&apos;t carry links. Select the image and add a link to{' '}
-            {SIGNATURE_COMPANY.websiteLabel} so the company name stays clickable.
-          </li>
-          <li>Pick the mode that matches your inbox, or download both if you switch themes.</li>
         </ul>
       </div>
 
@@ -233,7 +232,7 @@ const copy = async () => {
       <div className="form-actions studio__actions">
         <button
           type="button"
-          className="btn btn--primary"
+          className="btn btn--ghost"
           onClick={() => download([mode])}
           disabled={status.busy || !fontsReady}
         >
@@ -241,12 +240,12 @@ const copy = async () => {
         </button>
         <button
           type="button"
-          className="btn btn--ghost"
+          className="btn btn--primary"
           onClick={copy}
-          disabled={status.busy || !fontsReady || !canCopyImage()}
-          title={canCopyImage() ? undefined : 'Copy is not supported in this browser. Use Download instead.'}
+          disabled={status.busy || !fontsReady || !canCopySignature()}
+          title={canCopySignature() ? undefined : 'Copy is not supported in this browser. Use Download instead.'}
           >
-          Copy {activeMode.label.toLowerCase()} PNG
+          Copy signature
           </button>
         <button
           type="button"

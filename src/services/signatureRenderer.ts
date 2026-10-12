@@ -12,7 +12,6 @@ type SignaturePalette = (typeof SIGNATURE_MODES)[SignatureMode]
 type SignatureRenderOptions = {
   mode?: SignatureMode
   scale?: number
-  background?: string
 }
 
 type TextSegment = {
@@ -151,7 +150,7 @@ export function measureSignature(ctx: CanvasRenderingContext2D, details: Signatu
 
 function drawLogo(
   ctx: CanvasRenderingContext2D,
-  logo: ReturnType<typeof measureSignature>['logo'],
+  logo: ReturnType<typeof layoutLogo> & { x: number; y: number },
   colors: SignaturePalette,
 ) {
   const family = SIGNATURE_LAYOUT.fonts.logo
@@ -233,6 +232,31 @@ export async function createSignaturePng(
     canvas.toBlob((result) => (result ? resolve(result) : reject(new Error('PNG export failed'))), 'image/png')
   })
   return { blob, size }
+}
+
+/**
+ * Renders only the logo as a transparent PNG data URL, for embedding in the HTML signature.
+ * `size` is the 1x size the <img> should be displayed at.
+ */
+export async function createLogoDataUrl({ mode = 'light', scale = 2 }: SignatureRenderOptions = {}) {
+  await loadSignatureFonts()
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    throw new Error('Canvas 2D context is not available')
+  }
+  const logo = layoutLogo(ctx)
+  const width = Math.ceil(logo.width)
+  const height = Math.ceil(logo.height)
+
+  canvas.width = width * scale
+  canvas.height = height * scale
+  ctx.setTransform(scale, 0, 0, scale, 0, 0)
+  ctx.textBaseline = 'alphabetic'
+  ctx.textAlign = 'left'
+  drawLogo(ctx, { ...logo, x: 0, y: 0 }, SIGNATURE_MODES[mode])
+
+  return { dataUrl: canvas.toDataURL('image/png'), size: { width, height } }
 }
 
 export function signatureFileName(
