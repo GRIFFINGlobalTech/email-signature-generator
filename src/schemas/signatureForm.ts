@@ -5,8 +5,7 @@ import {
   isValidPhoneForCountry,
   normalizePhoneNumber,
 } from '../utils/phone'
-
-const COMPANY_EMAIL_DOMAIN = 'griffinglobaltech.com'
+import { COMPANY_EMAIL_DOMAINS } from '../config/signature'
 
 const namePattern = /^[\p{L}][\p{L} .'-]*$/u
 
@@ -63,8 +62,8 @@ const signatureFormFields = z.object({
     .min(1, 'Company email is required')
     .pipe(z.email({ error: 'Enter a valid email address' }))
     .transform((value) => value.toLowerCase())
-    .refine((value) => value.endsWith(`@${COMPANY_EMAIL_DOMAIN}`), {
-      message: `Use your @${COMPANY_EMAIL_DOMAIN} email`,
+    .refine((value) => COMPANY_EMAIL_DOMAINS.some((domain) => value.endsWith(`@${domain}`)), {
+      message: `Use your ${COMPANY_EMAIL_DOMAINS.map((domain) => `@${domain}`).join(' or ')} email`,
     }),
   phoneCountry: z.custom<CountryCode>(isPhoneCountryCode, {
     message: 'Select a valid country calling code',

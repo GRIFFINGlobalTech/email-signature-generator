@@ -10,7 +10,9 @@ test.describe('2.2.1-2.2.1: Validate email format and company domain, phone form
 
     await page.getByRole('button', { name: 'Continue' }).click()
 
-    await expect(page.locator('#email-error')).toHaveText('Use your @griffinglobaltech.com email')
+    await expect(page.locator('#email-error')).toHaveText(
+      'Use your @griffinglobaltech.com or @thejitu.com email',
+    )
     await expect(page.locator('#phone-error')).toHaveText(
       'Enter a valid phone number for the selected country',
     )
@@ -27,5 +29,15 @@ test.describe('2.2.1-2.2.1: Validate email format and company domain, phone form
     await expect(page.getByRole('heading', { name: "You're ready for a Griffin signature" })).toBeVisible()
     await expect(page.locator('.success-summary dd').nth(0)).toHaveText('Ada Lovelace')
     await expect(page.locator('.success-summary dd').nth(1)).toHaveText('Senior Product Engineer')
+  })
+
+  test('accepts a thejitu.com company email', async ({ page }) => {
+    await page.goto('/')
+
+    await fillSignatureForm(page, { email: 'ada.lovelace@thejitu.com' })
+    await page.getByRole('button', { name: 'Continue' }).click()
+
+    await expect(page.getByRole('heading', { name: "You're ready for a Griffin signature" })).toBeVisible()
+    await expect(page.locator('.success-summary dd').nth(2)).toHaveText('ada.lovelace@thejitu.com')
   })
 })

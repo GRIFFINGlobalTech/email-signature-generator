@@ -4,6 +4,8 @@ export const SIGNATURE_COMPANY = {
   websiteLabel: 'griffinglobaltech.com',
 }
 
+export const COMPANY_EMAIL_DOMAINS = ['griffinglobaltech.com', 'thejitu.com'] as const
+
 // Every export has a transparent background. The mode only decides the ink colours,
 // so the signature stays readable on a light or a dark inbox.
 export const SIGNATURE_MODES = {
