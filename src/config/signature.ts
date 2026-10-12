@@ -27,7 +27,7 @@ export const SIGNATURE_MODES = {
     labelInk: '#ffffff',
     divider: '#e6e6e6',
   },
-}
+} as const
 
 export const SIGNATURE_SCALES = [
   {
@@ -48,9 +48,13 @@ export const SIGNATURE_SCALES = [
     label: 'Extra sharp',
     description: 'Largest file, for 4K displays.',
   },
-]
+] as const
 
-export const DEFAULT_SCALE_ID = '2x'
+export type SignatureMode = keyof typeof SIGNATURE_MODES
+export type SignatureScaleId = (typeof SIGNATURE_SCALES)[number]['id']
+export type SignatureScale = (typeof SIGNATURE_SCALES)[number]
+
+export const DEFAULT_SCALE_ID = '2x' satisfies SignatureScaleId
 
 // All measurements are CSS pixels at 1x; exports multiply them by the chosen scale.
 export const SIGNATURE_LAYOUT = {
