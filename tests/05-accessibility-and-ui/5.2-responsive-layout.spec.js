@@ -43,6 +43,28 @@ async function expectNoHorizontalOverflow(page) {
   )
 }
 
+async function expectMobileActionLayout(page, groupSelector, buttonCount) {
+  const buttons = await page.locator(`${groupSelector} .btn`).evaluateAll((elements) =>
+    elements.map((element) => {
+      const { x, y, width } = element.getBoundingClientRect()
+      return { x, y, width }
+    }),
+  )
+
+  expect(buttons).toHaveLength(buttonCount)
+  if (buttonCount === 2) {
+    expect(Math.abs(buttons[0].y - buttons[1].y)).toBeLessThan(1)
+    expect(Math.abs(buttons[0].width - buttons[1].width)).toBeLessThan(1)
+    expect(buttons[0].x).toBeLessThan(buttons[1].x)
+    return
+  }
+
+  expect(buttons[0].y).toBeLessThan(buttons[1].y)
+  expect(Math.abs(buttons[1].y - buttons[2].y)).toBeLessThan(1)
+  expect(Math.abs(buttons[1].width - buttons[2].width)).toBeLessThan(1)
+  expect(buttons[1].x).toBeLessThan(buttons[2].x)
+}
+
 test.describe('5.2.1-5.2.x: Check the complete workflow at desktop, tablet, and mobile viewports.', () => {
   for (const viewport of viewports) {
     test(`keeps the workflow usable at ${viewport.width}px`, async ({ page }) => {
@@ -51,6 +73,9 @@ test.describe('5.2.1-5.2.x: Check the complete workflow at desktop, tablet, and 
 
       await expect(page.getByRole('heading', { name: 'Tell us who this signature is for' })).toBeVisible()
       await expectNoHorizontalOverflow(page)
+      if (viewport.width < 760) {
+        await expectMobileActionLayout(page, '.form-actions--form', 2)
+      }
 
       const themeToggle = page.locator('.theme-toggle')
       const initialThemeTarget = await themeToggle.getAttribute('aria-label')
@@ -72,6 +97,9 @@ test.describe('5.2.1-5.2.x: Check the complete workflow at desktop, tablet, and 
       await page.getByRole('button', { name: 'Continue' }).click()
       await expect(page.getByRole('heading', { name: "You're ready for a Griffin signature" })).toBeVisible()
       await expectNoHorizontalOverflow(page)
+      if (viewport.width < 760) {
+        await expectMobileActionLayout(page, '.form-actions--success', 3)
+      }
 
       await page.getByRole('button', { name: 'Generate signature' }).click()
       await expect(page.getByRole('heading', { name: "Ada Lovelace's Griffin signature" })).toBeVisible()
@@ -90,6 +118,9 @@ test.describe('5.2.1-5.2.x: Check the complete workflow at desktop, tablet, and 
       await expect(page.getByRole('button', { name: 'Copy signature' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'Back to details' })).toBeVisible()
       await expectNoHorizontalOverflow(page)
+      if (viewport.width < 760) {
+        await expectMobileActionLayout(page, '.studio__actions', 3)
+      }
     })
   }
 })
