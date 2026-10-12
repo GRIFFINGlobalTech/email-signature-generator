@@ -649,8 +649,10 @@ select {
 }
 
 .success-summary dd {
+  min-width: 0;
   margin: 0;
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 @media (min-width: 760px) {
@@ -702,6 +704,16 @@ select {
     justify-self: center;
     width: auto;
     min-width: 50%;
+  }
+}
+
+@media (max-width: 359px) {
+  .site-header {
+    gap: 12px;
+  }
+
+  .site-header .brand-lockup {
+    width: min(220px, calc(100vw - 132px));
   }
 }
 

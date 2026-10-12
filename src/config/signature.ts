@@ -15,9 +15,9 @@ export const SIGNATURE_MODES = {
     description: 'Green text for white or light email backgrounds.',
     previewBackground: '#ffffff',
     logo: '#8cc63f',
-    text: '#b4e04a',
-    labelInk: '#b4e04a',
-    divider: '#b4e04a',
+    text: '#89c641',
+    labelInk: '#89c641',
+    divider: '#89c641',
   },
   dark: {
     id: 'dark',
@@ -25,9 +25,9 @@ export const SIGNATURE_MODES = {
     description: 'Green text for dark-mode inboxes.',
     previewBackground: '#1f1f1f',
     logo: '#9bd14b',
-    text: '#b4e04a',
-    labelInk: '#b4e04a',
-    divider: '#b4e04a',
+    text: '#89c641',
+    labelInk: '#89c641',
+    divider: '#89c641',
   },
 } as const
 
