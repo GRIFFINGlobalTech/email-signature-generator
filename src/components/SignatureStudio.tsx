@@ -73,17 +73,13 @@ export function SignatureStudio({ details, onBack }: SignatureStudioProps) {
     setSize(renderSignature(canvasRef.current, details, { mode, scale: previewScale }))
   }, [details, mode, fontsReady])
 
-  const download = async (modes: readonly SignatureMode[]) => {
+  const download = async () => {
     setStatus({ busy: true, message: 'Generating PNG…', error: false })
     try {
-      const files = []
-      for (const modeId of modes) {
-        const { blob } = await createSignaturePng(details, { mode: modeId, scale: scale.value })
-        const fileName = signatureFileName(details, { mode: modeId, scale: scale.value })
-        downloadBlob(blob, fileName)
-        files.push(fileName)
-      }
-      setStatus({ busy: false, message: `Downloaded ${files.join(' and ')}`, error: false })
+      const { blob } = await createSignaturePng(details, { mode, scale: scale.value })
+      const fileName = signatureFileName(details, { mode, scale: scale.value })
+      downloadBlob(blob, fileName)
+      setStatus({ busy: false, message: `Downloaded ${fileName}`, error: false })
     } catch {
       setStatus({
         busy: false,
@@ -232,28 +228,20 @@ const copy = async () => {
       <div className="form-actions studio__actions">
         <button
           type="button"
-          className="btn btn--ghost"
-          onClick={() => download([mode])}
-          disabled={status.busy || !fontsReady}
-        >
-          Download {activeMode.label.toLowerCase()} PNG
-        </button>
-        <button
-          type="button"
           className="btn btn--primary"
           onClick={copy}
           disabled={status.busy || !fontsReady || !canCopySignature()}
           title={canCopySignature() ? undefined : 'Copy is not supported in this browser. Use Download instead.'}
-          >
+        >
           Copy signature
-          </button>
+        </button>
         <button
           type="button"
           className="btn btn--ghost"
-          onClick={() => download(MODE_IDS)}
+          onClick={download}
           disabled={status.busy || !fontsReady}
         >
-          Download both
+          Download PNG
         </button>
         <button type="button" className="btn btn--ghost btn--back" onClick={onBack}>
           Back to details
