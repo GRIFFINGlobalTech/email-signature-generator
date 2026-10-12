@@ -2,11 +2,12 @@
 
 React app for Griffin Global Technologies (GGT) that will autogenerate a company email signature.
 
-This repository is an initialized Vite + React project only. Feature work is not implemented yet.
+This Vite + React + TypeScript app creates email signature previews and PNG downloads. Company email is suggested from the first and last name, and phone numbers are validated against the selected country's numbering plan.
 
 ## Stack
 
 - React
+- TypeScript
 - HTML
 - CSS
 - Vite
@@ -28,6 +29,7 @@ Other scripts:
 npm run build
 npm run preview
 npm run lint
+npm run typecheck
 ```
 
 ## Feature tickets

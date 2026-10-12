@@ -1,3 +1,20 @@
+import type { InputHTMLAttributes, ReactNode } from 'react'
+
+type FieldRenderProps = Pick<
+  InputHTMLAttributes<HTMLInputElement>,
+  'id' | 'aria-invalid' | 'aria-describedby'
+>
+
+type FormFieldProps = {
+  id: string
+  label: string
+  required?: boolean
+  error?: string
+  hint?: string
+  children: (fieldProps: FieldRenderProps) => ReactNode
+  className?: string
+}
+
 export function FormField({
   id,
   label,
@@ -6,7 +23,7 @@ export function FormField({
   hint,
   children,
   className = '',
-}) {
+}: FormFieldProps) {
   const describedBy = [
     hint ? `${id}-hint` : null,
     error ? `${id}-error` : null,
