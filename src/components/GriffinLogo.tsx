@@ -1,4 +1,8 @@
-export function GriffinLogo({ compact = false }) {
+type GriffinLogoProps = {
+  compact?: boolean
+}
+
+export function GriffinLogo({ compact = false }: GriffinLogoProps) {
   return (
     <div className={`brand-lockup${compact ? ' is-compact' : ''}`} aria-label="Griffin Global Technologies">
       <span className="brand-lockup__word">GRIFFIN</span>

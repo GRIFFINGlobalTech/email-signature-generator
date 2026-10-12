@@ -29,7 +29,7 @@ test.describe('2.0.1-2.0.1: Check that required fields, labels, placeholders, an
     await expect(page.locator('#surname')).toHaveAttribute('placeholder', 'Hoover')
     await expect(page.locator('#jobTitle')).toHaveAttribute('placeholder', 'Chief Executive Officer')
     await expect(page.locator('#email')).toHaveAttribute('placeholder', 'name@griffinglobaltech.com')
-    await expect(page.locator('#phone')).toHaveAttribute('placeholder', '+1 (678) 261-8289')
+    await expect(page.locator('#phone')).toHaveAttribute('placeholder', '678 261 8289')
 
     await fillSignatureForm(page)
 

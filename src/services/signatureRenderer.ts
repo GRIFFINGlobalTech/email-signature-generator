@@ -1,10 +1,28 @@
 import { SIGNATURE_COMPANY, SIGNATURE_LAYOUT, SIGNATURE_MODES } from '../config/signature'
+import type { SignatureMode } from '../config/signature'
+import type { SignatureFormData } from '../schemas/signatureForm'
+import { formatPhoneNumber } from '../utils/phone'
 
 const LOGO_WORD = 'GRIFFIN'
 const LOGO_SUB = 'GLOBAL TECHNOLOGIES'
 const MEASURE_SIZE = 100
 
-const font = (weight, size, family) => `${weight} ${size}px ${family}`
+type SignaturePalette = (typeof SIGNATURE_MODES)[SignatureMode]
+
+type SignatureRenderOptions = {
+  mode?: SignatureMode
+  scale?: number
+  background?: string
+}
+
+type TextSegment = {
+  text: string
+  weight: 400 | 700
+  role?: 'label'
+  underline?: boolean
+}
+
+const font = (weight: number, size: number, family: string) => `${weight} ${size}px ${family}`
 
 // Canvas only draws web fonts that have finished loading, so wait for them before rendering.
 export async function loadSignatureFonts() {
@@ -20,12 +38,18 @@ export async function loadSignatureFonts() {
   }
 }
 
-function fitFontSize(ctx, text, weight, family, targetWidth) {
+function fitFontSize(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  weight: number,
+  family: string,
+  targetWidth: number,
+) {
   ctx.font = font(weight, MEASURE_SIZE, family)
   return (MEASURE_SIZE * targetWidth) / ctx.measureText(text).width
 }
 
-function layoutLogo(ctx) {
+function layoutLogo(ctx: CanvasRenderingContext2D) {
   const { logoWidth, logoSubRatio, logoRowGap, logoBarHeight, logoBarGap, fonts } = SIGNATURE_LAYOUT
 
   const wordSize = fitFontSize(ctx, LOGO_WORD, 800, fonts.logo, logoWidth)
@@ -54,7 +78,9 @@ function layoutLogo(ctx) {
   }
 }
 
-function buildTextLines(details) {
+function buildTextLines(
+  details: SignatureFormData,
+): { size: number; lineHeight: number; segments: TextSegment[] }[] {
   const { lines } = SIGNATURE_LAYOUT
   const fullName = `${details.firstName} ${details.surname}`.trim()
 
@@ -72,7 +98,7 @@ function buildTextLines(details) {
       ...lines.detail,
       segments: [
         { text: 'Phone: ', weight: 700, role: 'label' },
-        { text: details.phone, weight: 400 },
+        { text: formatPhoneNumber(details.phone, details.phoneCountry), weight: 400 },
       ],
     },
     {
@@ -82,7 +108,7 @@ function buildTextLines(details) {
   ]
 }
 
-function layoutText(ctx, details) {
+function layoutText(ctx: CanvasRenderingContext2D, details: SignatureFormData) {
   const family = SIGNATURE_LAYOUT.fonts.text
   let top = 0
   let width = 0
@@ -105,7 +131,7 @@ function layoutText(ctx, details) {
   return { width, height: top, lines }
 }
 
-export function measureSignature(ctx, details) {
+export function measureSignature(ctx: CanvasRenderingContext2D, details: SignatureFormData) {
   const { padding, dividerGap, dividerWidth } = SIGNATURE_LAYOUT
   const logo = layoutLogo(ctx)
   const text = layoutText(ctx, details)
@@ -123,7 +149,11 @@ export function measureSignature(ctx, details) {
   }
 }
 
-function drawLogo(ctx, logo, colors) {
+function drawLogo(
+  ctx: CanvasRenderingContext2D,
+  logo: ReturnType<typeof measureSignature>['logo'],
+  colors: SignaturePalette,
+) {
   const family = SIGNATURE_LAYOUT.fonts.logo
   ctx.fillStyle = colors.logo
 
@@ -136,7 +166,11 @@ function drawLogo(ctx, logo, colors) {
   ctx.fillText(LOGO_SUB, logo.x + logo.sub.x, logo.y + logo.sub.baseline)
 }
 
-function drawText(ctx, text, colors) {
+function drawText(
+  ctx: CanvasRenderingContext2D,
+  text: ReturnType<typeof measureSignature>['text'],
+  colors: SignaturePalette,
+) {
   const family = SIGNATURE_LAYOUT.fonts.text
 
   for (const line of text.lines) {
@@ -157,9 +191,16 @@ function drawText(ctx, text, colors) {
  * Draws the signature onto `canvas` with a transparent background.
  * Returns the 1x size so callers can display or insert the image at its intended size.
  */
-export function renderSignature(canvas, details, { mode = 'light', scale = 1 } = {}) {
-  const colors = SIGNATURE_MODES[mode] ?? SIGNATURE_MODES.light
+export function renderSignature(
+  canvas: HTMLCanvasElement,
+  details: SignatureFormData,
+  { mode = 'light', scale = 1 }: SignatureRenderOptions = {},
+) {
+  const colors = SIGNATURE_MODES[mode]
   const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    throw new Error('Canvas 2D context is not available')
+  }
   const layout = measureSignature(ctx, details)
 
   // Resizing clears the canvas and resets the context state.
@@ -181,17 +222,23 @@ export function renderSignature(canvas, details, { mode = 'light', scale = 1 } =
   return { width: layout.width, height: layout.height }
 }
 
-export async function createSignaturePng(details, options) {
+export async function createSignaturePng(
+  details: SignatureFormData,
+  options: SignatureRenderOptions = {},
+) {
   await loadSignatureFonts()
   const canvas = document.createElement('canvas')
   const size = renderSignature(canvas, details, options)
-  const blob = await new Promise((resolve, reject) => {
+  const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((result) => (result ? resolve(result) : reject(new Error('PNG export failed'))), 'image/png')
   })
   return { blob, size }
 }
 
-export function signatureFileName(details, { mode, scale }) {
+export function signatureFileName(
+  details: SignatureFormData,
+  { mode, scale }: { mode: SignatureMode; scale: number },
+) {
   const slug = `${details.firstName}-${details.surname}`
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
@@ -202,7 +249,7 @@ export function signatureFileName(details, { mode, scale }) {
   return `griffin-signature-${slug || 'team-member'}-${mode}${suffix}.png`
 }
 
-export function downloadBlob(blob, fileName) {
+export function downloadBlob(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url

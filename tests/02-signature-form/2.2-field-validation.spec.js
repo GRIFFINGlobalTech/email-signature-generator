@@ -12,7 +12,7 @@ test.describe('2.2.1-2.2.1: Validate email format and company domain, phone form
 
     await expect(page.locator('#email-error')).toHaveText('Use your @griffinglobaltech.com email')
     await expect(page.locator('#phone-error')).toHaveText(
-      'Enter a valid phone number with country code, e.g. +1 (678) 261-8289',
+      'Enter a valid phone number for the selected country',
     )
 
     await fillSignatureForm(page, validWhitespaceSignatureFixture)

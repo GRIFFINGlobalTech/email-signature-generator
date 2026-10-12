@@ -1,11 +1,16 @@
 import { z } from 'zod'
+import type { CountryCode } from 'libphonenumber-js'
+import {
+  isPhoneCountryCode,
+  isValidPhoneForCountry,
+  normalizePhoneNumber,
+} from '../utils/phone'
 
 const COMPANY_EMAIL_DOMAIN = 'griffinglobaltech.com'
 
 const namePattern = /^[\p{L}][\p{L} .'-]*$/u
-const phonePattern = /^\+?[0-9](?:[0-9\s().-]{6,22}[0-9])$/
 
-const requiredName = (label) =>
+const requiredName = (label: string) =>
   z.string().trim().superRefine((value, ctx) => {
     if (!value) {
       ctx.addIssue({ code: 'custom', message: `${label} is required` })
@@ -27,14 +32,6 @@ const requiredName = (label) =>
     }
   })
 
-const optionalText = (max, label) =>
-  z
-    .string()
-    .trim()
-    .max(max, `${label} must be ${max} characters or fewer`)
-    .optional()
-    .or(z.literal(''))
-
 const optionalUrl = z
   .string()
   .trim()
@@ -44,7 +41,7 @@ const optionalUrl = z
     message: 'Enter a valid URL, including https://',
   })
 
-export const signatureFormSchema = z.object({
+const signatureFormFields = z.object({
   firstName: requiredName('First name'),
   surname: requiredName('Surname'),
   jobTitle: z.string().trim().superRefine((value, ctx) => {
@@ -69,14 +66,32 @@ export const signatureFormSchema = z.object({
     .refine((value) => value.endsWith(`@${COMPANY_EMAIL_DOMAIN}`), {
       message: `Use your @${COMPANY_EMAIL_DOMAIN} email`,
     }),
-  phone: z
-    .string()
-    .trim()
-    .min(1, 'Phone number is required')
-    .regex(phonePattern, 'Enter a valid phone number with country code, e.g. +1 (678) 261-8289'),
+  phoneCountry: z.custom<CountryCode>(isPhoneCountryCode, {
+    message: 'Select a valid country calling code',
+  }),
+  phone: z.string().trim().min(1, 'Phone number is required'),
   linkedinUrl: optionalUrl,
   calendarUrl: optionalUrl,
 })
+
+export const signatureFormSchema = signatureFormFields
+  .superRefine(({ phone, phoneCountry }, ctx) => {
+    if (phone && isPhoneCountryCode(phoneCountry) && !isValidPhoneForCountry(phone, phoneCountry)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['phone'],
+        message: 'Enter a valid phone number for the selected country',
+      })
+    }
+  })
+  .transform(({ phone, phoneCountry, ...details }) => ({
+    ...details,
+    phone: normalizePhoneNumber(phone, phoneCountry),
+    phoneCountry,
+  }))
+
+export type SignatureFormInput = z.input<typeof signatureFormSchema>
+export type SignatureFormData = z.output<typeof signatureFormSchema>
 
 export const signatureFormDefaults = {
   firstName: '',
@@ -84,8 +99,15 @@ export const signatureFormDefaults = {
   jobTitle: '',
   email: '',
   phone: '',
+  phoneCountry: 'US',
   linkedinUrl: '',
   calendarUrl: '',
-}
+} satisfies SignatureFormInput
 
-export const REQUIRED_FIELDS = ['firstName', 'surname', 'jobTitle', 'email', 'phone']
+export const REQUIRED_FIELDS = [
+  'firstName',
+  'surname',
+  'jobTitle',
+  'email',
+  'phone',
+] as const satisfies readonly (keyof SignatureFormInput)[]

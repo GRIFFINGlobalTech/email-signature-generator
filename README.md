@@ -2,11 +2,12 @@
 
 React app for Griffin Global Technologies (GGT) that will autogenerate a company email signature.
 
-This repository is an initialized Vite + React project only. Feature work is not implemented yet.
+This Vite + React + TypeScript app creates email signature previews and PNG downloads. Company email is suggested from the first and last name, and phone numbers are validated against the selected country's numbering plan.
 
 ## Stack
 
 - React
+- TypeScript
 - HTML
 - CSS
 - Vite
@@ -28,6 +29,7 @@ Other scripts:
 npm run build
 npm run preview
 npm run lint
+npm run typecheck
 ```
 
 ## Feature tickets
@@ -57,4 +59,11 @@ npm run lint
 
 ## Deployment
 
-Target host is Vercel. After the first GitHub push, connect this repository in the Vercel dashboard. Vite is detected automatically (`npm run build`, output `dist`).
+This app is configured for Vercel. To connect it:
+
+1. In Vercel, select **Add New... > Project** and import `GRIFFINGlobalTech/email-signature-generator` from GitHub.
+2. Keep the project root as the repository root. Vercel detects Vite; confirm the build command is `npm run build` and the output directory is `dist`.
+3. In **Project Settings > Git**, set **Production Branch** to `main`.
+4. Deploy the project. Commits and merges to `main` create production deployments. Commits to `develop` create preview deployments for staging; Vercel provides a stable branch URL in the deployment details.
+
+If you want a custom staging URL, add a domain under **Project Settings > Domains** and assign it to the `develop` branch. Keep production domains assigned to the production environment. Configure any environment variables separately for the Production and Preview environments under **Project Settings > Environment Variables**.
