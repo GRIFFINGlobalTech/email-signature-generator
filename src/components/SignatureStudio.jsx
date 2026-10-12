@@ -12,7 +12,13 @@ import {
   renderSignature,
   signatureFileName,
 } from '../services/signatureRenderer'
+import {
+  canCopyImage,
+  copySignature,
+  downloadSignatures,
+} from '../services/signatureActions'
 import './SignatureStudio.css'
+
 
 const MODE_IDS = Object.keys(SIGNATURE_MODES)
 
@@ -70,6 +76,27 @@ export function SignatureStudio({ details, onBack }) {
   }
 
   const stageClass = showTransparency ? 'signature-stage is-checker' : 'signature-stage'
+
+const copy = async () => {
+  setStatus({ busy: true, message: 'Copying…', error: false })
+  try {
+    await copySignature(details, mode, scale.value)
+    setStatus({
+      busy: false,
+      message:
+        mode === 'dark'
+          ? 'Copied with a dark background. Use Download for a transparent version.'
+          : 'Copied light signature. Paste it into your email client.',
+      error: false,
+    })
+  } catch {
+    setStatus({
+      busy: false,
+      message: 'Copy failed. Allow clipboard access, or use Download instead.',
+      error: true,
+    })
+  }
+}
 
   return (
     <section className="form-card studio" aria-labelledby="studio-title">
@@ -189,6 +216,15 @@ export function SignatureStudio({ details, onBack }) {
         <button type="button" className="btn btn--ghost" onClick={onBack}>
           Back to details
         </button>
+        <button
+          type="button"
+          className="btn btn--ghost"
+          onClick={copy}
+          disabled={status.busy || !fontsReady || !canCopyImage()}
+          title={canCopyImage() ? undefined : 'Copy is not supported in this browser. Use Download instead.'}
+          >
+          Copy {activeMode.label.toLowerCase()} PNG
+          </button>
         <button
           type="button"
           className="btn btn--ghost"
