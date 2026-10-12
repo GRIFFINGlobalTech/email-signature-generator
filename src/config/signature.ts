@@ -15,9 +15,10 @@ export const SIGNATURE_MODES = {
     description: 'Green text for white or light email backgrounds.',
     previewBackground: '#ffffff',
     logo: '#8cc63f',
-    text: '#b4e04a',
-    labelInk: '#b4e04a',
-    divider: '#b4e04a',
+    // Same green as the logo: the paler lime washes out on white.
+    text: '#8cc63f',
+    labelInk: '#8cc63f',
+    divider: '#8cc63f',
   },
   dark: {
     id: 'dark',

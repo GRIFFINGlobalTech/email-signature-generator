@@ -89,7 +89,10 @@ export function SignatureStudio({ details, onBack }: SignatureStudioProps) {
     }
   }
 
-  const stageClass = showTransparency ? 'signature-stage is-checker' : 'signature-stage'
+  // Dark mode ink is light, so it needs a dark checkerboard to stay readable.
+  const stageClass = showTransparency
+    ? `signature-stage is-checker${mode === 'dark' ? ' is-checker--dark' : ''}`
+    : 'signature-stage'
 
 const copy = async () => {
   setStatus({ busy: true, message: 'Copying…', error: false })
