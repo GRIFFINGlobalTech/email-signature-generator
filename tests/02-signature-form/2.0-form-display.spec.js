@@ -6,6 +6,12 @@ test.describe('2.0.1-2.0.1: Check that required fields, labels, placeholders, an
   test('displays the signature form and accepts user input', async ({ page }) => {
     await page.goto('/')
 
+    await page.locator('#firstName').fill('Ada')
+    await page.locator('#surname').fill('Lovelace')
+    await expect(page.locator('#email')).toHaveValue('')
+    await page.locator('#jobTitle').fill('chief executive officer')
+    await expect(page.locator('#jobTitle')).toHaveValue('Chief Executive Officer')
+
     await expect(page.getByRole('heading', { name: 'Tell us who this signature is for' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible()
 
@@ -29,6 +35,7 @@ test.describe('2.0.1-2.0.1: Check that required fields, labels, placeholders, an
     await expect(page.locator('#surname')).toHaveAttribute('placeholder', 'Hoover')
     await expect(page.locator('#jobTitle')).toHaveAttribute('placeholder', 'Chief Executive Officer')
     await expect(page.locator('#email')).toHaveAttribute('placeholder', 'name@griffinglobaltech.com')
+    await expect(page.locator('#email')).toHaveAttribute('autocomplete', 'off')
     await expect(page.locator('#phone')).toHaveAttribute('placeholder', '678 261 8289')
 
     await fillSignatureForm(page)

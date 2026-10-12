@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Controller, useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormField } from './FormField'
@@ -13,14 +13,10 @@ import {
 import { formatPhoneNumber } from '../utils/phone'
 import { PhoneCountryPicker } from './PhoneCountryPicker'
 
-const COMPANY_EMAIL_DOMAIN = 'griffinglobaltech.com'
-
-function emailNamePart(name: string) {
-  return name
-    .normalize('NFKD')
-    .replace(/\p{M}/gu, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '')
+function capitalizeTitle(value: string) {
+  return value.replace(/(^|[\s-])(\p{L})/gu, (_, separator: string, letter: string) =>
+    `${separator}${letter.toUpperCase()}`,
+  )
 }
 
 function CheckIcon() {
@@ -44,7 +40,6 @@ export function SignatureForm() {
     register,
     handleSubmit,
     reset,
-    setValue,
     control,
     formState: { errors, isSubmitting, isSubmitSuccessful, dirtyFields, touchedFields },
   } = useForm<SignatureFormInput, unknown, SignatureFormData>({
@@ -55,16 +50,6 @@ export function SignatureForm() {
   })
 
   const values = useWatch({ control })
-  useEffect(() => {
-    if (dirtyFields.email) return
-
-    const firstName = emailNamePart(values.firstName ?? '')
-    const surname = emailNamePart(values.surname ?? '')
-    const suggestedEmail =
-      firstName && surname ? `${firstName}.${surname}@${COMPANY_EMAIL_DOMAIN}` : ''
-
-    setValue('email', suggestedEmail)
-  }, [dirtyFields.email, setValue, values.firstName, values.surname])
 
   const completedRequired = useMemo(
     () =>
@@ -207,7 +192,11 @@ export function SignatureForm() {
             {(fieldProps) => (
               <input
                 {...fieldProps}
-                {...register('jobTitle')}
+                {...register('jobTitle', {
+                  onChange: (event) => {
+                    event.currentTarget.value = capitalizeTitle(event.currentTarget.value)
+                  },
+                })}
                 autoComplete="organization-title"
                 placeholder="Chief Executive Officer"
               />
@@ -224,7 +213,7 @@ export function SignatureForm() {
             label="Company email"
             required
             error={errors.email?.message}
-            hint="Suggested from first and surname. Edit if your company email differs."
+            hint="Use your @griffinglobaltech.com or @thejitu.com address."
             className="span-2"
           >
             {(fieldProps) => (
@@ -233,7 +222,7 @@ export function SignatureForm() {
                 {...register('email')}
                 type="email"
                 inputMode="email"
-                autoComplete="email"
+                autoComplete="off"
                 placeholder="name@griffinglobaltech.com"
               />
             )}
