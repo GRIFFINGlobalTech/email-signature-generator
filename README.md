@@ -12,7 +12,7 @@ This Vite + React + TypeScript app creates email signature previews and PNG down
 - CSS
 - Vite
 - GitHub (version control)
-- Vercel (planned deployment)
+- GitHub Pages (deployment)
 
 ## Getting started
 
@@ -59,11 +59,11 @@ npm run typecheck
 
 ## Deployment
 
-This app is configured for Vercel. To connect it:
+The site is deployed to GitHub Pages by the workflow in `.github/workflows/deploy-pages.yml`.
 
-1. In Vercel, select **Add New... > Project** and import `GRIFFINGlobalTech/email-signature-generator` from GitHub.
-2. Keep the project root as the repository root. Vercel detects Vite; confirm the build command is `npm run build` and the output directory is `dist`.
-3. In **Project Settings > Git**, set **Production Branch** to `main`.
-4. Deploy the project. Commits and merges to `main` create production deployments. Commits to `develop` create preview deployments for staging; Vercel provides a stable branch URL in the deployment details.
+1. Push or merge your changes to `main`.
+2. In the repository on GitHub, open **Settings > Pages** and select **GitHub Actions** under **Build and deployment > Source**.
+3. Open the **Actions** tab and wait for the **Deploy to GitHub Pages** workflow to finish.
+4. Visit <https://griffinglobaltech.github.io/email-signature-generator/>.
 
-If you want a custom staging URL, add a domain under **Project Settings > Domains** and assign it to the `develop` branch. Keep production domains assigned to the production environment. Configure any environment variables separately for the Production and Preview environments under **Project Settings > Environment Variables**.
+The workflow builds the Vite app and publishes the `dist` directory. Local development continues to use the root path; the repository subpath is applied only in GitHub Actions builds.
