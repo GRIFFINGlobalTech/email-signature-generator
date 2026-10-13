@@ -54,6 +54,10 @@ const signatureFormFields = z.object({
     }
     if (value.length > 80) {
       ctx.addIssue({ code: 'custom', message: 'Job title must be 80 characters or fewer' })
+      return
+    }
+    if (!/\p{L}/u.test(value)) {
+      ctx.addIssue({ code: 'custom', message: 'Job title must include at least one letter' })
     }
   }),
   email: z
