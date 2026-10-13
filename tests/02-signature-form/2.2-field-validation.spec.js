@@ -22,6 +22,20 @@ test.describe('2.2.1-2.2.1: Validate email format and company domain, phone form
     expect(topDifferenceAfterError).toBeLessThan(1)
   })
 
+  test('rejects numeric-only job titles but accepts titles containing numbers', async ({ page }) => {
+    await page.goto('/')
+
+    await fillSignatureForm(page, { jobTitle: '12345' })
+    await page.getByRole('button', { name: 'Continue' }).click()
+
+    await expect(page.locator('#jobTitle-error')).toHaveText('Job title must include at least one letter')
+
+    await page.locator('#jobTitle').fill('VP 2')
+    await page.getByRole('button', { name: 'Continue' }).click()
+
+    await expect(page.getByRole('heading', { name: "You're ready for a Griffin signature" })).toBeVisible()
+  })
+
   test('flags invalid values and accepts valid values with extra whitespace', async ({ page }) => {
     await page.goto('/')
 
